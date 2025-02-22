@@ -28,7 +28,7 @@ To run server py manage.py makemigrations, py manage.py migrate, py manage.py ru
 
 endpoints-
   For Customer Portal localhost:8000/
-                             /customerService
+                             customerService
                                             /homepage - For to display home page form 
                                             /login -  Customer Login page
                                             /customer_register -register page 
@@ -36,6 +36,6 @@ endpoints-
 
  Customer Service Dashboard localhost:8000/
                                           EmployeeService/
-                                                         /getAllCustomerComplaints - fetching  all customer form requests
+                                                         getAllCustomerComplaints - fetching  all customer form requests
                                             
                                             
