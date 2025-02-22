@@ -1,0 +1,79 @@
+
+{% extends 'Main.html' %}
+
+{% block content %}
+
+<div class="card shadow-lg p-4">
+    <h3 class="text-center">Register</h3>
+    
+    <!-- Bootstrap Alerts -->
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+    {% if form.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <ul class="mb-0">
+        {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="id_username" class="form-label">Full Name<span class="text-danger fw-bold">*</span></label>
+            {{ form.username }}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_phone_number" class="form-label">Mobile Number<span class="text-danger fw-bold">*</span></label>
+            {{ form.phone_number }}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_email" class="form-label">Email<span class="text-danger fw-bold">*</span></label>
+            {{ form.email }}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_password" class="form-label">Password<span class="text-danger fw-bold">*</span></label>
+            {{ form.password }}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_confirm_password" class="form-label">Confirm Password<span class="text-danger fw-bold">*</span></label>
+            {{ form.confirm_password }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
+
+    <p class="text-center mt-3">
+        Already have an account? <a href="{% url 'customerlogin' %}">Login</a>
+    </p>
+</div>
+
+
+<!-- Redirect after success -->
+{% if success %}
+<script>
+setTimeout(function() {
+    window.location.pathname = "customerService/login";  
+}, 3000);
+</script>
+{% endif %}
+
+{% endblock %}

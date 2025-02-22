@@ -1,0 +1,161 @@
+{% extends 'EmployeeMain.html' %}
+{% block content %}
+
+<style>
+    .container {
+        overflow-x: auto;
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Search Form -->
+    <form id="searchForm" method="GET" action="" class="col-md-6 col-12 d-flex mb-3">
+        <input type="text" name="search" id="searchInput" class="form-control " 
+               placeholder="Search by Ticket ID or Customer Name" value="{{ search_query }}">
+        <button type="submit" class="btn btn-primary mx-2">Search</button>
+        <button type="button" class="btn btn-danger w-50" onclick="clearFilters()" >Clear Filter</button>
+    </form>
+
+    <script>
+        function clearFilters() {
+    let url = window.location.origin + window.location.pathname;
+    console.log(url);
+    window.location.replace(url); 
+}
+    </script>
+
+    <!-- Complaints Table -->
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>S.No</th>
+                <th>Ticket ID</th>
+                <th>Customer Name</th>
+                <th>Service Type</th>
+                <th>Address</th>
+                <th>Document</th>
+                <th>Created At</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for complaint in complaints %}
+            <tr id="row-{{ complaint.id }}">
+                <td>{{ forloop.counter0|add:complaints.start_index }}</td>
+                <td>{{ complaint.ticket_id }}</td>
+                <td>{{ complaint.customer.username }}</td>
+                <td>{{ complaint.service_type }}</td>
+                <td>{{ complaint.address }}</td>
+                <td>
+                    {% if complaint.document %}
+                        <a href="{{ complaint.document.url }}" target="_blank">View Document</a>
+                    {% else %}
+                        No Document
+                    {% endif %}
+                </td>
+                <td>{{ complaint.created_at }}</td>
+                <td>
+                    <span id="status-{{ complaint.id }}" class="badge 
+                        {% if complaint.status == 'pending' %}bg-danger
+                        {% elif complaint.status == 'Inprogress' %}bg-warning
+                        {% else %}bg-success{% endif %}">
+                        {{ complaint.status|capfirst }}
+                    </span>
+                </td>
+                <td>
+                    <select class="form-select status-dropdown" data-id="{{ complaint.id }}">
+                        <option value="" disabled selected>Update Status</option>
+                        <option value="Inprogress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="text-center">No complaints found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Buttons -->
+    {% if paginator.num_pages > 1 %}
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if not complaints.has_previous %}disabled{% endif %}">
+                <a class="page-link" href="?page=1&search={{ search_query }}">First</a>
+            </li>
+
+            {% if complaints.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ complaints.previous_page_number }}&search={{ search_query }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in paginator.page_range %}
+                {% if num == complaints.number %}
+                    <li class="page-item active">
+                        <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
+                    </li>
+                {% elif num > complaints.number|add:"-2" and num < complaints.number|add:"2" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if complaints.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ complaints.next_page_number }}&search={{ search_query }}">Next</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item {% if not complaints.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ paginator.num_pages }}&search={{ search_query }}">Last</a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- JavaScript for AJAX Status Update -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".status-dropdown").forEach(function(dropdown) {
+        dropdown.addEventListener("change", function() {
+            let complaintId = this.dataset.id;
+            let newStatus = this.value;
+
+            if (newStatus) {
+                fetch(`http://127.0.0.1:8000/EmployeeService/update-complaint-status/${complaintId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: `status=${newStatus}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let statusElement = document.getElementById(`status-${complaintId}`);
+                        statusElement.textContent = newStatus;
+
+                        if (newStatus === "Inprogress") {
+                            statusElement.className = "badge bg-warning";
+                        } else if (newStatus === "Resolved") {
+                            statusElement.className = "badge bg-success";
+                        }
+                    } else {
+                        alert("Failed to update status.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

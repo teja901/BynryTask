@@ -1,0 +1,74 @@
+{% extends 'Main.html' %}
+
+{% block content %}
+<style>
+    .highlight{
+        color: red !important;
+    }
+</style>
+
+<div class="row d-flex justify-content-center align-items-center card">
+
+    <div class="card-body col-12">
+
+        <h4 class="text-center">Customer Details</h4>
+        <p class="fw-bold">Name : {{customer.username}}</p>
+        <p class="fw-bold">Mobile Number : {{customer.phone_number}}</p>
+        <p class="fw-bold">Email : {{customer.email}}</p>
+    </div>
+
+    <div class="col-12  card-body">
+        <h1 class="text-center text-success fw-bolder my-4">Track Your Queries</h1>
+        <div class="d-flex justify-content-evenly align-items-center">
+            <a class="fw-bold display-6 text-decoration-none {% if type == 'All' %}highlight{% else %}''{% endif %}" href="{% url 'customerprofile'  %}?type=All">All</a>
+            <a class="fw-bold display-6 text-decoration-none {% if type == 'pending' %}highlight{% else %}''{% endif %}"  href="{% url 'customerprofile'  %}?type=pending">Pending</a>
+            <a class="fw-bold display-6 text-decoration-none {% if type == 'Inprogress' %}highlight{% else %}''{% endif %}"  href="{% url 'customerprofile'  %}?type=Inprogress">In Progress</a>
+            <a class="fw-bold display-6 text-decoration-none {% if type == 'resolved' %}highlight{% else %}''{% endif %}"  href="{% url 'customerprofile'  %}?type=resolved">Resolved</a>
+        </div>
+
+    </div>
+
+   
+    <div class="col-12 card-body">
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Service Type</th>
+                    <th>Ticket ID</th>
+                    <th>Status</th>
+                    <th>Created Time</th>
+                    {% if request.GET.type == "resolved" %}
+                        <th>Resolved Time</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if data %}
+                    {% for item in data %}
+                        <tr>
+                            <td>{{ item.service_type }}</td>
+                            <td>{{ item.ticket_id }}</td>
+                            <td>{{ item.status }}</td>
+                            <td>{{ item.created_at }}</td>
+                            {% if request.GET.type == "resolved" %}
+                                <td>{{ item.resolvedTime|default:"Not Available" }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="{% if request.GET.type == 'resolved' %}5{% else %}4{% endif %}" class="text-center">
+                            No records found
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    
+ 
+</div>
+
+
+
+{% endblock %}
