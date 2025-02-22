@@ -27,7 +27,7 @@ def getAllCustomerComplaints(request):
         # else:
         #      customersComplaints = CustomerComplaint.objects.select_related('customer').filter(status="Resolved").order_by('-id')
 
-    paginator = Paginator(customersComplaints, 1)
+    paginator = Paginator(customersComplaints, 10)
     page = request.GET.get('page', 1)
 
     try:
@@ -60,7 +60,7 @@ def getInProgressCustomerComplaints(request):
         # else:
         #      customersComplaints = CustomerComplaint.objects.select_related('customer').filter(status="Resolved").order_by('-id')
 
-    paginator = Paginator(customersComplaints, 1)
+    paginator = Paginator(customersComplaints, 10)
     page = request.GET.get('page', 1)
 
     try:
@@ -90,7 +90,7 @@ def getesolvedCustomerComplaints(request):
    
         customersComplaints = CustomerComplaint.objects.select_related('customer').filter(status="Resolved").order_by('-id')
 
-    paginator = Paginator(customersComplaints, 1)
+    paginator = Paginator(customersComplaints, 10)
     page = request.GET.get('page', 1)
 
     try:
