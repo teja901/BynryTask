@@ -1,0 +1,24 @@
+{% extends 'Main.html' %}
+
+
+{% block content %}
+
+
+<script>
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: "Success!",
+            text: "Your Ticket ID is {{ ticket_id }}",
+            icon: "success",
+            confirmButtonText: "OK"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/customerService/homepage";  
+            }
+        });
+    });
+    
+</script>
+
+{% endblock %}

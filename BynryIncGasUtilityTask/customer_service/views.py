@@ -13,9 +13,9 @@ def home_page(request):
         if not custId:
             return redirect('customerlogin')
         if form.is_valid():
-            print("Inside Form.........................")
+            
             customer = Customer.objects.get(id=custId) 
-            print(custId,"Customer................/////////////") 
+            
             complaint = CustomerComplaint(
                 customer=customer,
                 service_type=form.cleaned_data['service_type'],
@@ -24,7 +24,8 @@ def home_page(request):
                 document=form.cleaned_data.get('document')
             )
             complaint.save()
-            return HttpResponse("Sucess") 
+            request.session['ticket_id']=complaint.ticket_id
+            return redirect('success_page')
         else: print(form.errors,"Error")
     else:
        
@@ -37,6 +38,9 @@ def home_page(request):
 def login_page(request):
     return render(request,"CustomerLoginPage.html")
 
+def success_page(request):
+    ticketId=request.session.get('ticket_id')
+    return render(request,"SucessPage.html",{'ticket_id':ticketId})
 
 from django.contrib import messages
 
